@@ -2,8 +2,18 @@ window.addEventListener("load", init);
 
 //Global Variables
 
+// Available Levels
+const levels = {
+  easy: 5,
+  medium: 3,
+  hard: 1
+};
+
+// Variable to change level
+const currentLevel = levels.medium;
+
 //We're doing "let" because time is going to change. Const is for variables that we're not going to reassign
-let time = 5;
+let time = currentLevel;
 let score = 0;
 //Not setting isPlaying, we're jsut initializing it
 let isPlaying;
@@ -35,13 +45,46 @@ const words = [
 
 //an init function/ Initialize game
 function init() {
+  // Show number of seconds in UI by take innerHTML value of seconds and setting it to currentLevel
+  seconds.innerHTML = currentLevel;
   // Load word from array
   showWord(words);
+  //Start matching on word input
+  wordInput.addEventListener("input", startMatch);
   //Call countdown every second
   //To do this we set an interval to repeat every 1 second, we use 1000 miliseconds to do this w/ JS
   setInterval(countdown, 1000);
   //Function to check Game status
   setInterval(checkStatus, 50);
+}
+
+// Start Match Function
+function startMatch() {
+  if (matchWords()) {
+    isPlaying = true;
+    time = currentLevel + 1;
+    showWord(words);
+    wordInput.value = "";
+    score++;
+  }
+  //if score is -1 (game reset), display 0
+  if (score === -1) {
+    scoreDisplay.innerHTML = 0;
+  } else {
+    scoreDisplay.innerHTML = score;
+  }
+}
+
+// Match currentWord to wordInput
+function matchWords() {
+  // To see if they match we have to get the value of the variable and compare it to the value of currentWord which is in the html input
+  if (wordInput.value === currentWord.innerHTML) {
+    message.innerHTML = "Correct!";
+    return true;
+  } else {
+    message.innerHTML = "";
+    return false;
+  }
 }
 
 // Pick & show random word from array
@@ -72,5 +115,7 @@ function countdown() {
 function checkStatus() {
   if (!isPlaying && time === 0) {
     message.innerHTML = "Game Over!!!";
+    //when you lose reset the score to -1 so the next word that starts the game doens't count as a freebie
+    score = -1;
   }
 }
